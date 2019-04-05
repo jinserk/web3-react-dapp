@@ -1,6 +1,7 @@
-import React, { Component } from "react";
+import React, { Component, Fragment, useStatus, useEffect } from "react";
 import Web3Provider, { Connectors, useWeb3Context } from "web3-react";
 
+import { ethers } from 'ethers';
 import './App.css';
 import { Web3Unavailable, AccountUnavailable } from "./Error";
 
@@ -8,31 +9,38 @@ const { MetaMaskConnector } = Connectors;
 const MetaMask = new MetaMaskConnector();
 const connectors = { MetaMask };
 
+
 function MyComponent() {
   const context = useWeb3Context();
-  const ether = context.library;
-  let provider = ether
+  const provider = context.library;
 
-  React.useEffect(() => {
-    context.setConnector("MetaMask")
-  }, []);
-  console.log(context);
+  provider.getBlockNumber().then((value) => {
+    console.log(value);
+  }).catch((err) => {
+    console.log(err);
+  });
 
   return (
-    <React.Fragment>
-      {context.active ? (
-        <React.Fragment>
-          <p>Active Connector: {context.connectorName || "None"}</p>
-          <p>Account: {context.account || "None"}</p>
-          <p>Network ID: {context.networkId || "None"}</p>
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <Web3Unavailable />
-        </React.Fragment>
-      )}
+    <Fragment>
+      <p>Active Connector: {context.connectorName || "None"}</p>
+      <p>Account: {context.account || "None"}</p>
+      <p>Network ID: {context.networkId || "None"}</p>
+    </Fragment>
+  );
+}
+
+function MetaMaskComponent() {
+  const context = useWeb3Context();
+
+  useEffect(() => {
+    context.setConnector("MetaMask")
+  }, []);
+
+  return (
+    <Fragment>
+      {context.active ? <MyComponent /> : <Web3Unavailable />}
       {context.error && <p>{context.error.toString()}</p>}
-    </React.Fragment>
+    </Fragment>
   );
 }
 
@@ -41,7 +49,7 @@ class App extends Component {
     return (
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         <div className="App">
-          <MyComponent />
+          <MetaMaskComponent />
         </div>
       </Web3Provider>
     );
