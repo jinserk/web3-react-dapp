@@ -1,30 +1,32 @@
-import React, { Component, Fragment, useStatus, useEffect } from "react";
+import React, { Component, Fragment, useEffect } from "react";
 import Web3Provider, { Connectors, useWeb3Context } from "web3-react";
 
-import { ethers } from 'ethers';
 import './App.css';
 import { Web3Unavailable, AccountUnavailable } from "./Error";
 
-const { MetaMaskConnector } = Connectors;
-const MetaMask = new MetaMaskConnector();
+const { InjectedConnector } = Connectors;
+const MetaMask = new InjectedConnector();
 const connectors = { MetaMask };
 
 
 function MyComponent() {
-  const context = useWeb3Context();
-  const provider = context.library;
+  const { active, library, connectorName, account, networkId } = useWeb3Context();
 
-  provider.getBlockNumber().then((value) => {
-    console.log(value);
-  }).catch((err) => {
-    console.log(err);
-  });
+  useEffect(() => {
+    if (active) {
+      library.getBlockNumber().then((value) => {
+        console.log(value);
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [active])
 
   return (
     <Fragment>
-      <p>Active Connector: {context.connectorName || "None"}</p>
-      <p>Account: {context.account || "None"}</p>
-      <p>Network ID: {context.networkId || "None"}</p>
+      <p>Active Connector: {connectorName || "None"}</p>
+      <p>Account: {account || "None"}</p>
+      <p>Network ID: {networkId || "None"}</p>
     </Fragment>
   );
 }
