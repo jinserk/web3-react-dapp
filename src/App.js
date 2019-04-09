@@ -12,9 +12,11 @@ const connectors = { MetaMask };
 function MyComponent() {
   const { active, library, connectorName, account, networkId } = useWeb3Context();
 
+  let blockNumber;
   useEffect(() => {
     if (active) {
       library.getBlockNumber().then((value) => {
+        blockNumber = value;
         console.log(value);
       }).catch((err) => {
         console.log(err);
@@ -27,6 +29,7 @@ function MyComponent() {
       <p>Active Connector: {connectorName || "None"}</p>
       <p>Account: {account || "None"}</p>
       <p>Network ID: {networkId || "None"}</p>
+      <p>Block Number: {blockNumber || "None"}</p>
     </Fragment>
   );
 }
