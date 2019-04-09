@@ -22,7 +22,7 @@ function MyComponent() {
         console.log(err);
       });
     }
-  }, [active])
+  }, [active, networkId])
 
   return (
     <Fragment>
