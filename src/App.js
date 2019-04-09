@@ -1,4 +1,4 @@
-import React, { Component, Fragment, useEffect } from "react";
+import React, { Component, Fragment, useState, useEffect } from "react";
 import Web3Provider, { Connectors, useWeb3Context } from "web3-react";
 
 import './App.css';
@@ -11,12 +11,12 @@ const connectors = { MetaMask };
 
 function MyComponent() {
   const { active, library, connectorName, account, networkId } = useWeb3Context();
+  const [blockNumber, setBlockNumber] = useState(0);
 
-  let blockNumber;
   useEffect(() => {
     if (active) {
       library.getBlockNumber().then((value) => {
-        blockNumber = value;
+        setBlockNumber(value);
         console.log(value);
       }).catch((err) => {
         console.log(err);
