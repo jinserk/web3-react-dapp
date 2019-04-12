@@ -81,7 +81,11 @@ export default function ErrorTemplate(props) {
           className="Web3Provider-message"
           dangerouslySetInnerHTML={{ __html: props.message }}
         />
+        <br />
+        <br />
+        <br />
       </div>
+      <br />
     </div>
   )
 }
@@ -91,7 +95,8 @@ export const AccountUnavailable = ErrorTemplate.bind(null, {
   message: `
 It seems that you don&apos;t have an ETH account selected. If using
 MetaMask, please make sure that your wallet is unlocked and that
-you have at least one account in your accounts list.`
+you have at least one account in your accounts list.
+`
 });
 
 export const Web3Unavailable = ErrorTemplate.bind(null, {

@@ -1,8 +1,10 @@
-import React, { Component, Fragment, useState, useEffect } from "react";
+import React, { Component, Fragment, useEffect } from "react";
 import Web3Provider, { Connectors, useWeb3Context } from "web3-react";
 
 import './App.css';
 import { Web3Unavailable, AccountUnavailable } from "./Error";
+import NetworkInfo from "./NetworkInfo";
+import AccountInfo from "./AccountInfo";
 
 const { InjectedConnector } = Connectors;
 const MetaMask = new InjectedConnector();
@@ -10,27 +12,20 @@ const connectors = { MetaMask };
 
 
 function MyComponent() {
-  const { active, library, connectorName, account, networkId } = useWeb3Context();
-  const [blockNumber, setBlockNumber] = useState(0);
+  const context = useWeb3Context();
 
   useEffect(() => {
-    if (active) {
-      library.getBlockNumber().then((value) => {
-        setBlockNumber(value);
-        console.log(value);
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [active, networkId])
+    context.account || context.unsetConnector("MetaMask");
+  }, [context.account]);
 
   return (
-    <Fragment>
-      <p>Active Connector: {connectorName || "None"}</p>
-      <p>Account: {account || "None"}</p>
-      <p>Network ID: {networkId || "None"}</p>
-      <p>Block Number: {blockNumber || "None"}</p>
-    </Fragment>
+    context.account ? (
+      <Fragment>
+        <NetworkInfo />
+        <br />
+        <AccountInfo account={context.account} />
+      </Fragment>
+    ) : <AccountUnavailable />
   );
 }
 
@@ -38,18 +33,13 @@ function MetaMaskComponent() {
   const context = useWeb3Context();
 
   useEffect(() => {
-    context.setConnector("MetaMask")
-  }, []);
+    context.active || context.setConnector("MetaMask");
+  }, [context]);
 
-  return (
-    <Fragment>
-      {context.active ? <MyComponent /> : <Web3Unavailable />}
-      {context.error && <p>{context.error.toString()}</p>}
-    </Fragment>
-  );
+  return (context.active ? <MyComponent /> : <Web3Unavailable />);
 }
 
-class App extends Component {
+export default class App extends Component {
   render() {
     return (
       <Web3Provider connectors={connectors} libraryName="ethers.js">
@@ -60,5 +50,3 @@ class App extends Component {
     );
   }
 }
-
-export default App;

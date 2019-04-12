@@ -1,4 +1,5 @@
 .App {
+  align: center;
   text-align: center;
 }
 
@@ -31,3 +32,45 @@
     transform: rotate(360deg);
   }
 }
+
+.App-table {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid black;
+    caption-side: top;
+}
+
+th {
+    width: 30%;
+    text-align: left;
+    vertial-align: center;
+    padding: 5px;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+td {
+    text-align: left;
+    vertial-align: center;
+    padding: 5px;
+    border-bottom: 1px solid black;
+}
+
+.inner-table {
+    border-collapse: collapse;
+    border: none;
+}
+
+.inner-td {
+    text-align: left;
+    vertial-align: center;
+    padding: 1px;
+    border: none;
+}
+
+
