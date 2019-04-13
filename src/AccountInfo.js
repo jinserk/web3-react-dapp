@@ -5,7 +5,7 @@ import { utils } from "ethers";
 import './App.css';
 
 
-function TransferETH() {
+function TransferETH(props) {
   const context = useWeb3Context();
   const provider = context.library;
   const signer = provider.getSigner(context.account);
@@ -47,8 +47,14 @@ function TransferETH() {
 
       signer.sendTransaction(transaction).then(tx => {
         console.log(tx);
+        provider.once(tx["hash"], receipt => {
+          console.log(receipt);
+          window.alert(`Transaction confirmed!`);
+          props.txModal(false);
+        });
       }).catch(err => {
         console.error(err);
+        window.alert(`Error occured!`);
       });
     }
   }
@@ -105,7 +111,7 @@ export default function AccountInfo(props) {
         console.log(err);
       });
     }
-  }, [provider])
+  }, [provider, txModal])
 
   return (
     <div className="App-table">
@@ -136,7 +142,7 @@ export default function AccountInfo(props) {
         { txModal && (
         <tr>
           <td colSpan="2">
-            <TransferETH />
+            <TransferETH txModal={setTxModal.bind(this)} />
           </td>
         </tr>
         )}
