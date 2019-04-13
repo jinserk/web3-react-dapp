@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useWeb3Context } from "web3-react";
 import { utils } from "ethers";
 
 import './App.css';
+import { useInterval } from "./Hook";
 
 export default function NetworkInfo() {
   const context = useWeb3Context();
@@ -11,20 +12,13 @@ export default function NetworkInfo() {
   const [blockNumber, setBlockNumber] = useState(0);
   const [gasPrice, setGasPrice] = useState("0");
 
-  useEffect(() => {
-    if (provider) {
-      provider.getBlockNumber().then((value) => {
-        setBlockNumber(value);
-      }).catch((err) => {
-        console.log(err);
-      });
-      provider.getGasPrice().then((value) => {
-        setGasPrice(utils.formatUnits(value, 9));
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [provider])
+  async function fetch() {
+      setBlockNumber(await provider.getBlockNumber());
+      setGasPrice(utils.formatUnits(await provider.getGasPrice(), 9));
+  }
+  fetch();
+
+  useInterval(() => { fetch(); }, 5000);
 
   return (
     <div className="App-table">

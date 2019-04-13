@@ -3,7 +3,7 @@ import { useWeb3Context } from "web3-react";
 import { utils } from "ethers";
 
 import './App.css';
-
+import { useInterval } from './Hook';
 
 function TransferETH(props) {
   const context = useWeb3Context();
@@ -16,9 +16,10 @@ function TransferETH(props) {
   const [gasLimit, setGasLimit] = useState("21000");
   const [nonce, setNonce] = useState(0);
 
-  signer.getTransactionCount()
-    .then(value => setNonce(value))
-    .catch(err => console.error(err));
+  async function getNonce() {
+    setNonce(await signer.getTransactionCount());
+  }
+  getNonce();
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -45,17 +46,20 @@ function TransferETH(props) {
       };
       console.log(transaction);
 
-      signer.sendTransaction(transaction).then(tx => {
-        console.log(tx);
-        provider.once(tx["hash"], receipt => {
-          console.log(receipt);
-          window.alert(`Transaction confirmed!`);
-          props.txModal(false);
-        });
-      }).catch(err => {
-        console.error(err);
-        window.alert(`Error occured!`);
-      });
+      async function sendTransaction(tx) {
+        try {
+          let resp = await signer.sendTransaction(tx);
+          provider.once(resp["hash"], receipt => {
+            console.log(receipt);
+            window.alert(`Transaction confirmed!`);
+            props.txModal(false);
+          });
+        } catch (err) {
+          console.error(err);
+          window.alert(`Error occured!`);
+        }
+      }
+      sendTransaction(transaction);
     }
   }
 
@@ -103,15 +107,12 @@ export default function AccountInfo(props) {
   const [ethBalance, setEthBalance] = useState(0);
   const [txModal, setTxModal] = useState(false);
 
-  useEffect(() => {
-    if (provider) {
-      provider.getBalance(props.account).then((value) => {
-        setEthBalance(utils.formatEther(value));
-      }).catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [provider, txModal])
+  async function fetchBalance() {
+    setEthBalance(utils.formatEther(await provider.getBalance(props.account)));
+  }
+
+  useEffect(() => { fetchBalance(); }, [provider, txModal]);
+  useInterval(() => {fetchBalance(); }, 5000);
 
   return (
     <div className="App-table">
